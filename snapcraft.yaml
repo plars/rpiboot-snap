@@ -1,0 +1,28 @@
+name: rpiboot
+version: '0.1'
+summary: Raspberry Pi USB booting code
+description: |
+  This is the USB MSD boot code which should work on the Raspberry Pi model A,
+  Compute Module, Compute module 3 and Raspberry Pi Zero.
+  
+  This version of rpiboot has been modified to work from directories which contain the booting firmware. There is a default directory msd/ which contains bootcode.bin and start.elf to turn the Raspberry Pi device into a USB Mass Storage Device (MSD).
+
+grade: stable
+confinement: strict
+
+parts:
+  rpiboot:
+    plugin: make
+    source: https://github.com/raspberrypi/usbboot.git
+    build: |
+      make
+    install: |
+      mv rpiboot $SNAPCRAFT_PART_INSTALL
+      cp -a msd $SNAPCRAFT_PART_INSTALL
+    build-packages:
+      - libusb-1.0-0-dev
+
+apps:
+  rpiboot:
+    command: ./rpiboot -d $SNAP/msd
+    plugs: [raw-usb, network-control]
